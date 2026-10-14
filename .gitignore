@@ -1,0 +1,24 @@
+# WordPress core (instalado pela imagem Docker / servidor)
+/wordpress/*
+!/wordpress/wp-content/
+/wordpress/wp-content/*
+!/wordpress/wp-content/themes/
+!/wordpress/wp-content/plugins/
+!/wordpress/wp-content/mu-plugins/
+
+# Mídia e caches
+/wordpress/wp-content/uploads/
+/wordpress/wp-content/cache/
+/wordpress/wp-content/upgrade/
+
+# Backups, dumps e segredos
+/dumps/*
+!/dumps/.gitkeep
+*.sql
+*.sql.gz
+*.zip
+*.tar.gz
+.env
+wp-config.php
+error_log
+debug.log

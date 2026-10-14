@@ -1,0 +1,46 @@
+services:
+  db:
+    image: mariadb:10.11
+    restart: unless-stopped
+    environment:
+      MARIADB_DATABASE: ${DB_NAME:-riocargas}
+      MARIADB_USER: ${DB_USER:-riocargas}
+      MARIADB_PASSWORD: ${DB_PASSWORD:-riocargas_local}
+      MARIADB_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-root_local}
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./dumps:/dumps
+
+  wordpress:
+    image: wordpress:php8.3-apache
+    restart: unless-stopped
+    depends_on:
+      - db
+    ports:
+      - "${WP_PORT:-8080}:80"
+    environment:
+      WORDPRESS_DB_HOST: db
+      WORDPRESS_DB_NAME: ${DB_NAME:-riocargas}
+      WORDPRESS_DB_USER: ${DB_USER:-riocargas}
+      WORDPRESS_DB_PASSWORD: ${DB_PASSWORD:-riocargas_local}
+      WORDPRESS_DEBUG: "1"
+    volumes:
+      - ./wordpress:/var/www/html
+
+  wpcli:
+    image: wordpress:cli-php8.3
+    profiles: ["cli"]
+    user: "33:33"
+    depends_on:
+      - db
+    environment:
+      WORDPRESS_DB_HOST: db
+      WORDPRESS_DB_NAME: ${DB_NAME:-riocargas}
+      WORDPRESS_DB_USER: ${DB_USER:-riocargas}
+      WORDPRESS_DB_PASSWORD: ${DB_PASSWORD:-riocargas_local}
+    volumes:
+      - ./wordpress:/var/www/html
+      - ./dumps:/dumps
+
+volumes:
+  db_data:
