@@ -103,3 +103,17 @@ add_action(
 	// Depois do módulo Promotions do Elementor, que registra placeholders com os mesmos nomes.
 	20
 );
+
+add_action(
+	'elementor/init',
+	function () {
+		if ( defined( 'ELEMENTOR_PRO_VERSION' ) ) {
+			return;
+		}
+
+		require_once RC_COMPONENTS_DIR . 'motion-fx/controls-group.php';
+		require_once RC_COMPONENTS_DIR . 'motion-fx/module.php';
+
+		new \RioCargas\Components\MotionFX\Module();
+	}
+);
