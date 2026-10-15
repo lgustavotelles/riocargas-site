@@ -21,6 +21,14 @@ function rc_components_replace_unlimited_elements() {
 	return did_action( 'elementor/loaded' ) && ! defined( 'UNLIMITED_ELEMENTS_INC' );
 }
 
+function rc_components_replace_powerpack() {
+	return did_action( 'elementor/loaded' ) && ! defined( 'POWERPACK_ELEMENTS_VER' );
+}
+
+function rc_components_replace_master_addons() {
+	return did_action( 'elementor/loaded' ) && ! defined( 'JLTMA_PLUGIN_VERSION' ) && ! defined( 'MASTER_ADDONS_VERSION' ) && ! defined( 'MA_EL_VERSION' );
+}
+
 function rc_components_page_uses( $widget_type ) {
 	$id = get_queried_object_id();
 	if ( ! $id ) {
@@ -105,6 +113,39 @@ add_action(
 );
 
 add_action(
+	'elementor/widgets/register',
+	function ( $widgets_manager ) {
+		if ( ! rc_components_replace_powerpack() ) {
+			return;
+		}
+		require_once RC_COMPONENTS_DIR . 'compat/elementor-schemes.php';
+		require_once RC_COMPONENTS_DIR . 'compat/pp-runtime.php';
+		require_once RC_COMPONENTS_DIR . 'widgets/pp-advanced-menu.php';
+		require_once RC_COMPONENTS_DIR . 'widgets/pp-buttons.php';
+		$widgets_manager->register( new \PowerpackElements\Modules\AdvancedMenu\Widgets\Advanced_Menu() );
+		$widgets_manager->register( new \PowerpackElements\Modules\Buttons\Widgets\Buttons() );
+	},
+	20
+);
+
+add_action(
+	'elementor/widgets/register',
+	function ( $widgets_manager ) {
+		if ( ! rc_components_replace_master_addons() ) {
+			return;
+		}
+		require_once RC_COMPONENTS_DIR . 'compat/ma-runtime.php';
+		require_once RC_COMPONENTS_DIR . 'widgets/ma-tabs.php';
+		require_once RC_COMPONENTS_DIR . 'widgets/ma-advanced-accordion.php';
+		require_once RC_COMPONENTS_DIR . 'widgets/ma-creative-links.php';
+		$widgets_manager->register( new \MasterAddons\Addons\Tabs() );
+		$widgets_manager->register( new \MasterAddons\Addons\Advanced_Accordion() );
+		$widgets_manager->register( new \MasterAddons\Addons\Creative_Links() );
+	},
+	20
+);
+
+add_action(
 	'elementor/init',
 	function () {
 		if ( defined( 'ELEMENTOR_PRO_VERSION' ) ) {
@@ -127,4 +168,79 @@ add_action(
 		wp_enqueue_style( 'rc-pro-compat', RC_COMPONENTS_URL . 'assets/pro-compat.css', [], RC_COMPONENTS_VERSION );
 	},
 	20
+);
+
+add_action(
+	'wp_enqueue_scripts',
+	function () {
+		// Helpers removidos do elementorCommon no Elementor 4 (softDeprecated etc.)
+		// ainda sao chamados por plugins antigos; sem eles a excecao interrompe a
+		// cadeia elementor/frontend/init e handlers posteriores nao registram.
+		wp_enqueue_script(
+			'rc-elementor-helpers-polyfill',
+			RC_COMPONENTS_URL . 'assets/compat/elementor-helpers-polyfill.js',
+			[ 'elementor-common' ],
+			RC_COMPONENTS_VERSION,
+			true
+		);
+
+		// PowerPack Elements: o plugin enfileirava frontend.css em todas as páginas
+		// (enqueue_frontend_styles) e registrava os scripts abaixo globalmente.
+		if ( rc_components_replace_powerpack() ) {
+			wp_enqueue_style( 'powerpack-frontend', RC_COMPONENTS_URL . 'assets/pp/frontend.min.css', [], '2.4.0' );
+
+			wp_register_script( 'jquery-smartmenu', RC_COMPONENTS_URL . 'assets/pp/jquery-smartmenu.js', [ 'jquery' ], '1.1.1', true );
+			wp_register_script( 'pp-advanced-menu', RC_COMPONENTS_URL . 'assets/pp/frontend-advanced-menu.js', [ 'jquery' ], '2.4.0', true );
+			wp_register_script( 'pp-tooltipster', RC_COMPONENTS_URL . 'assets/pp/tooltipster.min.js', [ 'jquery' ], '2.4.0', true );
+			wp_register_script( 'powerpack-frontend', RC_COMPONENTS_URL . 'assets/pp/frontend.js', [ 'jquery' ], '2.4.0', true );
+
+			$pp_localize = apply_filters(
+				'pp_elements_js_localize',
+				[ 'ajax_url' => admin_url( 'admin-ajax.php' ) ]
+			);
+			wp_localize_script( 'jquery', 'pp', $pp_localize );
+
+			if ( function_exists( 'wpforms' ) ) {
+				wpforms()->frontend->assets_css();
+			}
+		}
+
+		// Master Addons: jltma_enqueue_scripts enfileirava globalmente bootstrap + styles + plugins.js + scripts.js.
+		if ( rc_components_replace_master_addons() ) {
+			wp_enqueue_style( 'jltma-bootstrap', RC_COMPONENTS_URL . 'assets/ma/bootstrap.min.css' );
+			wp_enqueue_style( 'master-addons-main-style', RC_COMPONENTS_URL . 'assets/ma/master-addons-styles.css' );
+
+			wp_enqueue_script( 'master-addons-plugins', RC_COMPONENTS_URL . 'assets/ma/plugins.js', [ 'jquery' ], '7.1.3', true );
+			wp_enqueue_script( 'master-addons-scripts', RC_COMPONENTS_URL . 'assets/ma/master-addons-scripts.js', [ 'jquery' ], '7.1.3', true );
+
+			wp_localize_script(
+				'master-addons-scripts',
+				'jltma_scripts',
+				[
+					'plugin_url' => RC_COMPONENTS_URL . 'assets/ma/',
+					'ajaxurl'    => admin_url( 'admin-ajax.php' ),
+					'nonce'      => 'master-addons-elementor',
+				]
+			);
+
+			// Inline script que o plugin injetava antes do jquery-core.
+			$jltma_header_inline_scripts = 'function jltmaNS(n){for(var e=n.split("."),a=window,i="",r=e.length,t=0;r>t;t++)"window"!=e[t]&&(i=e[t],a[i]=a[i]||{},a=a[i]);return a;}';
+			if ( $jltma_header_inline_scripts = apply_filters( 'jltma_header_inline_scripts', $jltma_header_inline_scripts ) ) {
+				wp_add_inline_script( 'jquery-core', "/* < ![CDATA[ */\n" . $jltma_header_inline_scripts . "\n/* ]]> */", 'before' );
+			}
+		}
+	},
+	5
+);
+
+// Extensões do Master Addons sobre elementos: Wrapper Link, BG Slider e Glassmorphism.
+add_action(
+	'elementor/init',
+	function () {
+		if ( ! rc_components_replace_master_addons() ) {
+			return;
+		}
+		require_once RC_COMPONENTS_DIR . 'extensions/ma-extensions.php';
+		\RioCargas\Components\Extensions\MA_Extensions::init();
+	}
 );
