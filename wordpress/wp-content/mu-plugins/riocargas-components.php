@@ -17,6 +17,10 @@ function rc_components_replace_elementor_pro() {
 	return did_action( 'elementor/loaded' ) && ! defined( 'ELEMENTOR_PRO_VERSION' );
 }
 
+function rc_components_replace_unlimited_elements() {
+	return did_action( 'elementor/loaded' ) && ! defined( 'UNLIMITED_ELEMENTS_INC' );
+}
+
 function rc_components_page_uses( $widget_type ) {
 	$id = get_queried_object_id();
 	if ( ! $id ) {
@@ -44,6 +48,21 @@ add_action(
 );
 
 add_action(
+	'wp_enqueue_scripts',
+	function () {
+		if ( ! rc_components_replace_unlimited_elements() ) {
+			return;
+		}
+		wp_register_style( 'rc-owl-carousel', RC_COMPONENTS_URL . 'assets/owl-carousel/owl.carousel.css', [], '2.0.0' );
+		wp_register_script( 'rc-owl-carousel', RC_COMPONENTS_URL . 'assets/owl-carousel/owl.carousel.min.js', [ 'jquery' ], '2.0.0', true );
+		$fa = plugins_url( 'elementor/assets/lib/font-awesome/css/' );
+		wp_register_style( 'rc-fa', $fa . 'fontawesome.min.css', [], '5.15.3' );
+		wp_register_style( 'rc-fa-solid', $fa . 'solid.min.css', [ 'rc-fa' ], '5.15.3' );
+	},
+	5
+);
+
+add_action(
 	'elementor/dynamic_tags/register',
 	function ( $dynamic_tags ) {
 		if ( ! rc_components_replace_elementor_pro() ) {
@@ -66,6 +85,20 @@ add_action(
 		require_once RC_COMPONENTS_DIR . 'widgets/site-logo.php';
 		$widgets_manager->register( new \RioCargas\Components\Widgets\Animated_Headline() );
 		$widgets_manager->register( new \RioCargas\Components\Widgets\Site_Logo() );
+	},
+	20
+);
+
+add_action(
+	'elementor/widgets/register',
+	function ( $widgets_manager ) {
+		if ( ! rc_components_replace_unlimited_elements() ) {
+			return;
+		}
+		require_once RC_COMPONENTS_DIR . 'widgets/ue-card-carousel.php';
+		require_once RC_COMPONENTS_DIR . 'widgets/ue-content-accordion.php';
+		$widgets_manager->register( new \RioCargas\Components\Widgets\UE_Card_Carousel() );
+		$widgets_manager->register( new \RioCargas\Components\Widgets\UE_Content_Accordion() );
 	},
 	// Depois do módulo Promotions do Elementor, que registra placeholders com os mesmos nomes.
 	20
