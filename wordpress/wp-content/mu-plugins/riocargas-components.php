@@ -117,3 +117,14 @@ add_action(
 		new \RioCargas\Components\MotionFX\Module();
 	}
 );
+
+add_action(
+	'wp_enqueue_scripts',
+	function () {
+		if ( ! rc_components_replace_elementor_pro() ) {
+			return;
+		}
+		wp_enqueue_style( 'rc-pro-compat', RC_COMPONENTS_URL . 'assets/pro-compat.css', [], RC_COMPONENTS_VERSION );
+	},
+	20
+);
