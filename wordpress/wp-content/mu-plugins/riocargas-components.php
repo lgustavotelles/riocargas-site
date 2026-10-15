@@ -233,6 +233,10 @@ add_action(
 	5
 );
 
+// WPForms: substituto próprio — carrega classes agora e só inicializa em
+// plugins_loaded se o plugin original estiver ausente (evita redeclare).
+require_once RC_COMPONENTS_DIR . 'forms/wpforms-compat.php';
+
 // Extensões do Master Addons sobre elementos: Wrapper Link, BG Slider e Glassmorphism.
 add_action(
 	'elementor/init',
