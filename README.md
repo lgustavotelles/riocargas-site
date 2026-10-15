@@ -15,10 +15,16 @@ Requisitos: Docker com Docker Compose.
 
 ```bash
 cp .env.example .env
-# 1. Copie os arquivos do site (public_html) para ./wordpress
-# 2. Coloque o dump do banco em ./dumps/riocargas.sql
+# 1. Extraia o backup do cPanel e copie o conteúdo de public_html para ./wordpress
+#    (sem o wp-config.php de produção)
+cp config/wp-config.local.php wordpress/wp-config.php
+# 2. Remova do wordpress/.htaccess os blocos "Really Simple SSL Redirect"
+#    e "cPanel-generated" (localmente não há HTTPS nem handler do cPanel)
+# 3. Coloque o dump do banco em ./dumps/riocargas.sql
 docker compose up -d
 scripts/import-db.sh dumps/riocargas.sql
+# 4. Desative localmente os plugins que dependem do servidor de produção
+docker compose run --rm wpcli wp plugin deactivate really-simple-ssl litespeed-cache wp-maintenance-mode
 ```
 
 Site local: http://localhost:8080
@@ -27,3 +33,5 @@ Site local: http://localhost:8080
 1. Cada mudança vai num branch e vira um PR.
 2. Testar localmente e depois no staging.
 3. Publicar em produção só depois de aprovado e com backup feito.
+
+Relatório da análise inicial: [docs/AUDITORIA.md](docs/AUDITORIA.md)
