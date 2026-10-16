@@ -39,16 +39,16 @@ Legenda de prioridade: 🔴 alta · 🟠 média · 🟢 baixa
 | P1 | ✅ **resolvido 16/10** | Imagens enormes na home: `Footer.png` com **7,9 MB**, `Caminhao-RC.png` com 1,7 MB etc. Nenhuma das ~1.680 imagens era WebP. | **615 versões `.webp`** (q82) geradas ao lado dos originais em `uploads/` — ~108 MB economizados; `.htaccess` em `uploads/` serve o `.webp` só a navegadores com `Accept: image/webp` (originais intactos como fallback). Deploy via FTP em staging e produção; validado: `Caminhao-RC.png` 1,7 MB → 103 KB, 0 falhas. Pendente: gerar `.webp` das imagens enviadas **depois** desta data (rodar a conversão periodicamente). |
 | P2 | ✅ **resolvido 16/10** | As imagens fora da tela carregam todas de uma vez, sem *lazy load*. | **Ativado** no LiteSpeed Cache (`media-lazy` + `media-iframe_lazy`) em staging e produção — imagens e o mapa do Google carregam sob demanda ao rolar. |
 | P3 | 🟠 | **Plugins demais e repetidos**: 7 pacotes de add-ons para Elementor (Essential Addons, Master Addons Pro, PowerPack, Unlimited Elements, Ultimate Carousel, Header Footer Elementor, Templately), mais Astra Sites; 2 sistemas de formulário (Contact Form 7 + 3 extensões, e WPForms); 2 otimizadores (Autoptimize e LiteSpeed Cache). | Mapear quais widgets cada página usa e remover o que sobrar. Menos plugins deixa o site mais leve e reduz a superfície de ataque. |
-| P4 | 🟢 | Fontes do Google carregadas por `http://` (gera aviso de conteúdo inseguro) e sem `font-display`. | Hospedar as fontes localmente. |
-| P5 | ✅ **parcial 16/10** | Banco com 835 revisões antigas, 13 MB de estatísticas de visitas e uma base GeoIP de 63 MB em `uploads`. | **Revisões zeradas** (835 → 0 em staging e produção). Pendente decisão: o GeoIP (`GeoLite2-*.mmdb`, 63 MB) é usado pelo WP Statistics e seria baixado de novo — remover de verdade exige desativar a geolocalização do plugin (perde cidade/país nas estatísticas) ou remover o plugin. |
+| P4 | ✅ **verificado 16/10** | Fontes do Google carregadas por `http://` (aviso de conteúdo inseguro) e sem `font-display`. | **Não se reproduz em produção**: o HTML servido já sai com `https://` nas fontes (HTTPS forçado pelo Really Simple SSL). Sem ação necessária. |
+| P5 | ✅ **decidido 16/10** | Banco com 835 revisões antigas, 13 MB de estatísticas e GeoIP de 63 MB em `uploads`. | **Revisões zeradas** (835 → 0). WP Statistics + GeoIP **mantidos por decisão** — as estatísticas serão usadas numa funcionalidade futura do site. |
 
 ## 3. SEO
 
 | # | Prioridade | Problema | O que fazer |
 |---|---|---|---|
 | E1 | ✅ **resolvido 16/10** | As páginas não têm **meta description** e o site não usa nenhum plugin de SEO. | **Módulo `seo.php` no mu-plugin** (sem plugin externo): `<meta name="description">` + Open Graph/Twitter Card em todas as páginas — descrição via postmeta `rc_meta_desc` (customizada nas 5 páginas principais) com fallback automático para o conteúdo. Sitemap: `wp-sitemap.xml` nativo do WP. |
-| E2 | 🟢 | Há links que os buscadores não conseguem seguir e 5 imagens sem texto alternativo (`alt`) na home. | Corrigir no Elementor. |
-| E3 | 🟢 | Faltam dados estruturados de empresa (endereço, telefone, filiais). | Adicionar o schema `LocalBusiness`/`Organization`. |
+| E2 | ✅ **resolvido 16/10** | Imagens sem `alt` na home e links não seguíveis. | `alt` definido nos attachments da logo (`riocargasLogo.png`, `riocargasLogo-Branca.png`) — propaga para header/footer/menu mobile; 0 imagens sem `alt` na home. Os links `#`/`javascript:` restantes são itens-pai de menu com submenu e setas do carrossel — comportamento correto, falso positivo do Lighthouse. |
+| E3 | ✅ **resolvido 16/10** | Faltam dados estruturados de empresa (endereço, telefone, filiais). | Schema `LocalBusiness` (JSON-LD) emitido pelo `seo.php`: matriz Pavuna/RJ com telefone e horário + 6 filiais (Guarulhos, Cariacica, Nova Serrana, Campos, São Pedro da Aldeia, Barra Mansa). |
 
 ## 4. Erros e estabilidade
 

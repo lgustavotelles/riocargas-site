@@ -92,3 +92,47 @@ add_action(
 	},
 	1
 );
+
+/**
+ * Schema.org LocalBusiness — matriz + filiais (dados da pagina /unidades/).
+ * Emitido uma vez por pagina, em todas (canonical para a organizacao).
+ */
+add_action(
+	'wp_head',
+	function () {
+		if ( is_admin() || is_feed() || ! ( is_singular() || is_front_page() ) ) {
+			return;
+		}
+		$addr = function ( $street, $city, $state ) {
+			return array(
+				'@type'           => 'PostalAddress',
+				'streetAddress'   => $street,
+				'addressLocality' => $city,
+				'addressRegion'   => $state,
+				'addressCountry'  => 'BR',
+			);
+		};
+		$schema = array(
+			'@context'        => 'https://schema.org',
+			'@type'           => 'LocalBusiness',
+			'@id'             => home_url( '/#empresa' ),
+			'name'            => 'Rio Cargas Transporte e Logística',
+			'url'             => home_url( '/' ),
+			'logo'            => rc_seo_image( 0 ),
+			'email'           => 'sac@riocargas.com.br',
+			'telephone'       => '+55-21-3995-9846',
+			'address'         => $addr( 'Rua Benjamin Silva, 180, Pavuna', 'Rio de Janeiro', 'RJ' ),
+			'openingHours'    => 'Mo-Fr 08:30-17:30',
+			'subOrganization' => array(
+				array( '@type' => 'LocalBusiness', 'name' => 'Rio Cargas — Filial Guarulhos', 'telephone' => '+55-11-2422-7616', 'address' => $addr( 'Rua Guararapes, 415, Vila São Rafael', 'Guarulhos', 'SP' ) ),
+				array( '@type' => 'LocalBusiness', 'name' => 'Rio Cargas — Filial Cariacica', 'address' => $addr( 'Rua São Jorge, 48, Alto Lage', 'Cariacica', 'ES' ) ),
+				array( '@type' => 'LocalBusiness', 'name' => 'Rio Cargas — Filial Nova Serrana', 'address' => $addr( 'Rua João de Freitas, 390, Park Dona Gumercinda Martins', 'Nova Serrana', 'MG' ) ),
+				array( '@type' => 'LocalBusiness', 'name' => 'Rio Cargas — Unidade Campos dos Goytacazes', 'address' => $addr( 'Estrada do Capão, 378, Parque Aurora', 'Campos dos Goytacazes', 'RJ' ) ),
+				array( '@type' => 'LocalBusiness', 'name' => 'Rio Cargas — Unidade São Pedro da Aldeia', 'address' => $addr( 'Rodovia Amaral Peixoto, Lt 0293 Qd14 KM 106, Balneário das Conchas', 'São Pedro da Aldeia', 'RJ' ) ),
+				array( '@type' => 'LocalBusiness', 'name' => 'Rio Cargas — Unidade Barra Mansa', 'address' => $addr( 'Rodovia Presidente Dutra, 175, KM 268-50, Boa Sorte', 'Barra Mansa', 'RJ' ) ),
+			),
+		);
+		echo '<script type="application/ld+json">' . wp_json_encode( $schema, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES ) . '</script>' . "\n";
+	},
+	2
+);
