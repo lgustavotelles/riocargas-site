@@ -137,6 +137,39 @@ Deploy executado em `riocargas.com.br` (backup via WP Toolkit antes, mu-plugin s
 pagos desativados (arquivos intactos — remoção só após dias de observação).
 E-mail de teste "TESTE DEPLOY" foi enviado à caixa de contato (ignorar).
 
+## Pacote de segurança LGPD — uploads de formulários (commit 3f9ad8f)
+
+Bloqueia o acesso direto aos ~480 arquivos de `uploads/wpforms/` (currículos,
+apresentações) que estavam públicos por URL — exposição de dados pessoais.
+
+**O que o pacote faz sozinho** (sem passo manual de .htaccess):
+
+- No primeiro request, o módulo grava `Require all denied` em
+  `wp-content/uploads/wpforms/.htaccess` (bloco `BEGIN/END RioCargas LGPD`,
+  fora dos marcadores do WPForms, idempotente).
+- Acesso direto a qualquer arquivo da pasta → **403**.
+- E-mails de notificação passam a conter links assinados HMAC para
+  `admin-ajax.php?action=rc_wpforms_file&p=...&s=...`, que servem o arquivo
+  (`Content-Disposition: inline`, `X-Robots-Tag: noindex`). Link é permanente
+  — e-mails antigos continuam abrindo.
+- O endpoint fica ativo mesmo com o WPForms original reativado (rollback).
+
+**Deploy:** subir o novo `dist/riocargas-mu-plugin.zip` por cima do existente
+(extrair em `wp-content/`, sobrescrevendo) → carregar qualquer página do site
+uma vez para o `.htaccess` ser criado → validar:
+
+```
+# URL crua de um arquivo conhecido deve retornar 403:
+curl -I https://DOMINIO/wp-content/uploads/wpforms/<dir>/<arquivo>   # 403
+# Link assinado (de um e-mail novo ou gerado por wp eval) deve retornar 200.
+```
+
+**Rollback:** reativar WPForms + apagar `mu-plugins/riocargas-components*` +
+remover o bloco `RioCargas LGPD` do `.htaccess` de `uploads/wpforms/`.
+
+Validado localmente: direto 403, assinado 200, adulterado 403, traversal 404,
+submit real com upload → entry + e-mail com link funcional.
+
 ## Observações
 
 - `litespeed-cache` e `really-simple-ssl` devem **permanecer** em produção
