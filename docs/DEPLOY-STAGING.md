@@ -118,6 +118,25 @@ Staging `teste.riocargas.com.br` validado com os 6 pagos desativados + mu-plugin
 - [i] Plugins legados (CF7 stack, Conditional Menus etc.) seguem ativos/inativos no
       staging como estavam em produção — remoção é fase posterior, não bloqueia
 
+## Resultado do deploy em produção (executado em 21/10)
+
+Deploy executado em `riocargas.com.br` (backup via WP Toolkit antes, mu-plugin subido,
+6 pagos desativados, purge LiteSpeed+Autoptimize, Regenerate CSS Elementor):
+
+- [x] Todas as páginas públicas: 200; `unidades`/`manutencao` voltaram a renderizar
+      (estavam vazias por cache corrompido — **bug de produção corrigido**)
+- [x] Diff vs staging validado: `unidades` idêntica; demais ≤1,25 % ruído dinâmico
+- [x] Owl carousel: 11 itens; accordions/tabs; popups; Dropzone fornecedor (PT-BR)
+- [x] WPForms: `data-token` idêntico ao local/staging (`wpforms_crypto_secret_key`
+      preservada em todos os ambientes); honeypot; submit real → `success` +
+      confirmação + entry gravada + e-mail entregue
+- [x] Menu mobile, ícones (0 sem fonte), 0 erros JS, 0 requests falhos
+- [x] `areadofuncionario`: 404 anônimo (correto — restrita UM) e renderiza logado
+
+**Estado**: produção rodando 100 % com mu-plugin `riocargas-components`; 6 plugins
+pagos desativados (arquivos intactos — remoção só após dias de observação).
+E-mail de teste "TESTE DEPLOY" foi enviado à caixa de contato (ignorar).
+
 ## Observações
 
 - `litespeed-cache` e `really-simple-ssl` devem **permanecer** em produção
