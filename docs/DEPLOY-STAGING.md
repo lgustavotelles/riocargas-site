@@ -94,6 +94,30 @@ Mesmos passos, mas em produção **não apagar** os diretórios dos plugins pago
 só desativar. Remoção definitiva só depois de dias de observação estável em produção.
 Plugins legados (CF7 etc.) podem ser removidos junto — não têm dados ligados.
 
+## Resultado da validação em staging (executado em 21/10)
+
+Staging `teste.riocargas.com.br` validado com os 6 pagos desativados + mu-plugin instalado:
+
+- [x] Todas as páginas públicas renderizam; `unidades`/`manutencao` saíram **melhores**
+      que o estado original (que as servia vazias por cache LiteSpeed corrompido)
+- [x] Diff visual vs baseline: 0 px em `areadofuncionario`/`politica`; ≤1,25 % ruído
+      dinâmico nas demais
+- [x] Owl carousel `/unidades/`: 11 itens, nav, dots
+- [x] WPForms: markup + `data-token` **idênticos ao local** (segredo `wpforms_crypto_secret_key`
+      preservado no clone — tokens interoperáveis); validação em PT-BR; **submit real →
+      `success` + confirmação + entry gravada + e-mail disparado**
+- [x] Dropzone do popup "Fornecedor" inicializa (mensagem PT-BR)
+- [x] Editor Elementor abre, preview renderiza, painel de widgets ok
+- [x] `areadofuncionario` logado: 14 accordions + 23 tabs; anônimo → 404 (correto, restrita UM)
+- [x] Menu mobile abre com submenus; 0 erros JS; 0 requests falhos; 0 ícones sem fonte
+- [!] Admin do WPForms não existe (substituto é frontend-only): entries gravam na tabela
+      e notificações vão por e-mail como antes, mas **não há tela wp-admin para consultar
+      entries** — pendente decisão (construir lista mínima ou aceitar e-mail como canal)
+- [i] Erro CORS de fonte `google-fonts` no staging = artefato do clone (CSS estático com
+      URL de produção); não existe em produção
+- [i] Plugins legados (CF7 stack, Conditional Menus etc.) seguem ativos/inativos no
+      staging como estavam em produção — remoção é fase posterior, não bloqueia
+
 ## Observações
 
 - `litespeed-cache` e `really-simple-ssl` devem **permanecer** em produção
