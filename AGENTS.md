@@ -49,6 +49,16 @@ Start-Process 'C:\laragon\bin\apache\httpd-2.4.68-260617-Win64-VS18\bin\httpd.ex
 
 Se a virtualização for habilitada na BIOS (SVM) futuramente, o caminho Docker do `README.md` continua válido (WSL2 + Docker Desktop).
 
+## Mapa de plugins (auditoria 20/10 — uso real verificado no banco)
+
+**Necessários (em uso):** `elementor` (núcleo), `essential-addons-for-elementor-lite` (7 widgets eael-* em páginas publicadas), `popup-maker` (6 popups), `ultimate-member` (3 forms, área do funcionário), `creame-whatsapp-me` (botão WhatsApp), `autoptimize` + `autoclear-autoptimize-cache` (otimização), `loginizer` (segurança de login), `wp-statistics` (54.540 visitantes registrados — dados de produção), `litespeed-cache` (inativo local, **ativo em produção**), `really-simple-ssl` (idem — HTTPS de produção), mu-plugin `riocargas-components` (substitutos).
+
+**Substituídos — remover após validação em staging:** `elementor-pro`, `wpforms`, `powerpack-elements`, `master-addons-pro`, `unlimited-elements-for-elementor-premium`, `ultimate-carousel-for-elementor` (zero widgets em uso).
+
+**Legado sem uso — candidatos a remoção:** `contact-form-7` + `contact-form-7-skins` + `cf7-repeatable-fields` + `contact-form-cfdb7` (0 forms publicados, 0 shortcodes, 0 tabelas), `header-footer-elementor` (0 templates, 0 widgets hfe-*), `conditional-menus` (nav_menu_options sem condições), `essential-addons-elementor-old` (versão antiga), `members` (inativo; UM cobre roles), `astra-sites` + `templately` (importadores de template, só usados na construção), `image-optimization` (instalado, nunca rodou — 0 metas de otimização), `wp-sweep`/`wp-rollback`/`wp-maintenance-mode` (utilitários sob demanda — manter ou remover, inócuos).
+
+Obs.: roles `customer`/`shop_manager` no banco são resíduo do WooCommerce (plugin não instalado).
+
 ## Pendências abertas
 
 - ~~Excluir o usuário `wp_rest_api` no wp-admin de produção~~ — resolvido pelo dono em 15/10 (senhas de admin trocadas também).
