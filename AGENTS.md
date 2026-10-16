@@ -61,6 +61,8 @@ Se a virtualização for habilitada na BIOS (SVM) futuramente, o caminho Docker 
 
 Obs.: roles `customer`/`shop_manager` no banco são resíduo do WooCommerce (plugin não instalado).
 
+**Temas — mesma limpeza (20/10):** ativo `astra` 3.8.2; removidos localmente `consultera`, `flatsome`, `transportex`, `twentytwentythree`, `twentytwentyfour`, `vverner` (child de flatsome, legado — preservado no histórico git, commit `eee7263`). Mantido `twentytwentyfive` como fallback. Em produção: remover os inativos junto com os plugins, após staging.
+
 ## Pendências abertas
 
 - ~~Excluir o usuário `wp_rest_api` no wp-admin de produção~~ — resolvido pelo dono em 15/10 (senhas de admin trocadas também).
