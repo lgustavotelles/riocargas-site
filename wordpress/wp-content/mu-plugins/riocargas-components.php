@@ -233,6 +233,21 @@ add_action(
 	5
 );
 
+// HFE (header-footer-elementor) enfileira CSS de widgets que não existem no
+// Elementor Pro 3.7.1 instalado (mega-menu/blockquote são de versões novas) —
+// dequeue evita 404 na fila de estilos.
+add_action(
+	'wp_enqueue_scripts',
+	function () {
+		foreach ( [ 'hfe-mega-menu', 'hfe-widget-blockquote' ] as $hfe_orphan_handle ) {
+			if ( wp_style_is( $hfe_orphan_handle, 'enqueued' ) && ! file_exists( WP_CONTENT_DIR . '/plugins/elementor-pro/assets/css/' . ( 'hfe-mega-menu' === $hfe_orphan_handle ? 'widget-mega-menu' : 'widget-blockquote' ) . '.min.css' ) ) {
+				wp_dequeue_style( $hfe_orphan_handle );
+			}
+		}
+	},
+	100
+);
+
 // WPForms: substituto próprio — carrega classes agora e só inicializa em
 // plugins_loaded se o plugin original estiver ausente (evita redeclare).
 require_once RC_COMPONENTS_DIR . 'forms/wpforms-compat.php';
