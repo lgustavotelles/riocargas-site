@@ -30,6 +30,7 @@ Site WordPress de produção `riocargas.com.br` (tema Astra, Elementor 4.3.5, WP
 - **20/10 — todos os plugins pagos desligados localmente**: `elementor-pro`, `unlimited-elements-for-elementor-premium`, `ultimate-carousel-for-elementor` (este último sem nenhum widget em uso), `wpforms`, PowerPack e Master Addons desativados; substitutos do mu-plugin cobrem tudo que páginas públicas usam. Baseline anterior (`baseline-desktop`) estava corrompido: foi capturado com o bundle Autoptimize 410, então widgets UE apareciam vazios — baseline válido é `baseline2-desktop`. Diff ON-vs-OFF correto: `areadofuncionario`/`normas`/`unidades` **0 px**; demais ≤0,12% (badge WPForms na admin bar). `nav-menu`/`ue_side_menu`/`slides`/`pp-image-slider` só existem em posts privados/templates não renderizados — sem substituto por ora.
 - 15/10: `/unidades/` e `/manutencao/` retornam 200 em produção mas com **cache LiteSpeed corrompido** (~250-360 bytes, fragmento) — se o cache for limpo, fatal em produção. A substituição corrige isso.
 - Harness: `scripts/visual_check.py capture|diff` (Playwright, login `devin`/`devin-local-123` para páginas restritas).
+- **21/10 — DEPLOY EM PRODUÇÃO EXECUTADO E VALIDADO**: staging `teste.riocargas.com.br` criado via WP Toolkit (clone, banco `riocargas_wp_bxnrk`), validado por completo (visual, funcional, submit real, editor Elementor). Em produção: backup via WP Toolkit, upload de `dist/riocargas-mu-plugin.zip` em `public_html/wp-content/` + extract, 6 pagos desativados, purge LiteSpeed+Autoptimize, Regenerate CSS. Resultado: 7 páginas 200, 0 erros JS, 0 requests falhos, submit real gravando entry + e-mail; `/unidades/` e `/manutencao/` voltaram a renderizar (bug do cache corrompido corrigido). `data-token` do WPForms idêntico nos 3 ambientes (segredo preservado). Detalhes completos em `docs/DEPLOY-STAGING.md`. Período de observação aberto — não apagar os diretórios dos plugins pagos de produção ainda.
 
 ## Ambiente local (Windows, sem Docker)
 
@@ -68,5 +69,6 @@ Obs.: roles `customer`/`shop_manager` no banco são resíduo do WooCommerce (plu
 - ~~Excluir o usuário `wp_rest_api` no wp-admin de produção~~ — resolvido pelo dono em 15/10 (senhas de admin trocadas também).
 - Admins `vverner`/`vverner2` (agência, 2020): manter (decidido pelo dono).
 - Confirmar se existe cron no cPanel chamando `wp-cron.php` (`DISABLE_WP_CRON=true` no wp-config).
-- Criar staging (`teste.riocargas.com.br` via WP Toolkit) quando houver acesso ao cPanel.
+- ~~Criar staging (`teste.riocargas.com.br` via WP Toolkit)~~ — feito 21/10; staging existe e foi validado; deploy em produção executado no mesmo dia.
+- Após dias de observação estável em produção: remover diretórios dos 6 pagos + legados (CF7 stack, HFE, conditional-menus, members, astra-sites, templately, image-optimization, wp-sweep, wp-rollback) + temas inativos (menos astra + 1 fallback twenty*).
 - Backup automático externo e monitoramento de queda (sugestões da auditoria).
