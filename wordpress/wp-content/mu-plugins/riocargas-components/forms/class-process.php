@@ -856,6 +856,7 @@ class Process {
 				$headers[] = sprintf( 'Reply-To: %s', $replyto );
 			}
 			$body = self::email_template( $message, $form_data );
+			$body = \rc_wpforms_protect_links( $body ); // LGPD: links de arquivos viram endpoint assinado.
 			foreach ( $address as $to ) {
 				if ( $to ) {
 					wp_mail( $to, $subject, $body, $headers );

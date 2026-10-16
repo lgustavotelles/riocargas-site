@@ -16,6 +16,7 @@ require_once __DIR__ . '/class-facade.php';
 require_once __DIR__ . '/class-renderer.php';
 require_once __DIR__ . '/class-uploads.php';
 require_once __DIR__ . '/class-process.php';
+require_once __DIR__ . '/file-access.php'; // Endpoint assinado — ativo sempre (inclusive com o plugin original).
 
 // O stub WPForms\WPForms (para class_exists do Essential Addons) já é
 // declarado aqui — é seguro porque o plugin original declara a classe real
