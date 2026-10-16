@@ -252,6 +252,9 @@ add_action(
 // plugins_loaded se o plugin original estiver ausente (evita redeclare).
 require_once RC_COMPONENTS_DIR . 'forms/wpforms-compat.php';
 
+// Hardening global (bloqueios que não dependem dos substitutos).
+require_once RC_COMPONENTS_DIR . 'security.php';
+
 // Extensões do Master Addons sobre elementos: Wrapper Link, BG Slider e Glassmorphism.
 add_action(
 	'elementor/init',
