@@ -255,6 +255,9 @@ require_once RC_COMPONENTS_DIR . 'forms/wpforms-compat.php';
 // Hardening global (bloqueios que não dependem dos substitutos).
 require_once RC_COMPONENTS_DIR . 'security.php';
 
+// Meta description + Open Graph (o site não tem plugin de SEO).
+require_once RC_COMPONENTS_DIR . 'seo.php';
+
 // Extensões do Master Addons sobre elementos: Wrapper Link, BG Slider e Glassmorphism.
 add_action(
 	'elementor/init',

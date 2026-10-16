@@ -37,16 +37,16 @@ Legenda de prioridade: 🔴 alta · 🟠 média · 🟢 baixa
 | # | Prioridade | Problema | O que fazer |
 |---|---|---|---|
 | P1 | ✅ **resolvido 16/10** | Imagens enormes na home: `Footer.png` com **7,9 MB**, `Caminhao-RC.png` com 1,7 MB etc. Nenhuma das ~1.680 imagens era WebP. | **615 versões `.webp`** (q82) geradas ao lado dos originais em `uploads/` — ~108 MB economizados; `.htaccess` em `uploads/` serve o `.webp` só a navegadores com `Accept: image/webp` (originais intactos como fallback). Deploy via FTP em staging e produção; validado: `Caminhao-RC.png` 1,7 MB → 103 KB, 0 falhas. Pendente: gerar `.webp` das imagens enviadas **depois** desta data (rodar a conversão periodicamente). |
-| P2 | 🟠 | As imagens fora da tela carregam todas de uma vez, sem *lazy load*, e não têm largura e altura definidas. | Ativar o *lazy load* e definir as dimensões. |
+| P2 | ✅ **resolvido 16/10** | As imagens fora da tela carregam todas de uma vez, sem *lazy load*. | **Ativado** no LiteSpeed Cache (`media-lazy` + `media-iframe_lazy`) em staging e produção — imagens e o mapa do Google carregam sob demanda ao rolar. |
 | P3 | 🟠 | **Plugins demais e repetidos**: 7 pacotes de add-ons para Elementor (Essential Addons, Master Addons Pro, PowerPack, Unlimited Elements, Ultimate Carousel, Header Footer Elementor, Templately), mais Astra Sites; 2 sistemas de formulário (Contact Form 7 + 3 extensões, e WPForms); 2 otimizadores (Autoptimize e LiteSpeed Cache). | Mapear quais widgets cada página usa e remover o que sobrar. Menos plugins deixa o site mais leve e reduz a superfície de ataque. |
 | P4 | 🟢 | Fontes do Google carregadas por `http://` (gera aviso de conteúdo inseguro) e sem `font-display`. | Hospedar as fontes localmente. |
-| P5 | 🟢 | Banco com 835 revisões antigas, 13 MB de estatísticas de visitas e uma base GeoIP de 60 MB em `uploads`. | Limitar as revisões e limpar as estatísticas antigas. |
+| P5 | ✅ **parcial 16/10** | Banco com 835 revisões antigas, 13 MB de estatísticas de visitas e uma base GeoIP de 63 MB em `uploads`. | **Revisões zeradas** (835 → 0 em staging e produção). Pendente decisão: o GeoIP (`GeoLite2-*.mmdb`, 63 MB) é usado pelo WP Statistics e seria baixado de novo — remover de verdade exige desativar a geolocalização do plugin (perde cidade/país nas estatísticas) ou remover o plugin. |
 
 ## 3. SEO
 
 | # | Prioridade | Problema | O que fazer |
 |---|---|---|---|
-| E1 | 🟠 | As páginas não têm **meta description** e o site não usa nenhum plugin de SEO. | Instalar Rank Math ou Yoast e escrever título e descrição para cada página. |
+| E1 | ✅ **resolvido 16/10** | As páginas não têm **meta description** e o site não usa nenhum plugin de SEO. | **Módulo `seo.php` no mu-plugin** (sem plugin externo): `<meta name="description">` + Open Graph/Twitter Card em todas as páginas — descrição via postmeta `rc_meta_desc` (customizada nas 5 páginas principais) com fallback automático para o conteúdo. Sitemap: `wp-sitemap.xml` nativo do WP. |
 | E2 | 🟢 | Há links que os buscadores não conseguem seguir e 5 imagens sem texto alternativo (`alt`) na home. | Corrigir no Elementor. |
 | E3 | 🟢 | Faltam dados estruturados de empresa (endereço, telefone, filiais). | Adicionar o schema `LocalBusiness`/`Organization`. |
 
