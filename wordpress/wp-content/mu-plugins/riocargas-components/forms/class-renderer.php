@@ -567,7 +567,7 @@ class Renderer {
 		wp_register_script( 'rc-wpforms-itel', self::asset_url( 'assets/pro/lib/intl-tel-input/jquery.intl-tel-input.min.js' ), [ 'jquery' ], '17.0.13', true );
 		wp_register_script( 'rc-wpforms-itel-utils', self::asset_url( 'assets/pro/lib/intl-tel-input/jquery.intl-tel-input-utils.min.js' ), [ 'rc-wpforms-itel' ], '17.0.13', true );
 		wp_register_script( 'rc-wpforms-dropzone', self::asset_url( 'assets/pro/lib/dropzone.min.js' ), [], '5.9.2', true );
-		wp_register_script( 'rc-wpforms-file-upload', self::asset_url( 'assets/pro/js/wpforms-file-upload.min.js' ), [ 'jquery', 'rc-wpforms-dropzone' ], '1.7.6', true );
+		wp_register_script( 'rc-wpforms-file-upload', self::asset_url( 'assets/pro/js/wpforms-file-upload.min.js' ), [ 'jquery', 'rc-wpforms', 'wp-util', 'rc-wpforms-dropzone' ], '1.7.6', true );
 		wp_register_script( 'rc-wpforms-utils', self::asset_url( 'assets/js/utils.min.js' ), [ 'jquery' ], '1.7.6', true );
 		wp_register_script(
 			'rc-wpforms',
@@ -596,6 +596,33 @@ class Renderer {
 		wp_enqueue_script( 'rc-wpforms-itel-utils' );
 		wp_enqueue_script( 'rc-wpforms-file-upload' );
 		wp_enqueue_script( 'rc-wpforms' );
+
+		// Localize que o wpforms-file-upload.min.js espera (o plugin registra
+		// em 'wpforms-dropzone' quando um form com upload moderno esta presente).
+		wp_localize_script(
+			'rc-wpforms-dropzone',
+			'wpforms_file_upload',
+			[
+				'url'             => admin_url( 'admin-ajax.php' ),
+				'errors'          => [
+					'default_error'     => esc_html__( 'Something went wrong, please try again.', 'wpforms' ),
+					'file_not_uploaded' => esc_html__( 'This file was not uploaded.', 'wpforms' ),
+					'file_limit'        => wpforms_setting(
+						'validation-maxfilenumber',
+						/* translators: %s - max number of files allowed. */
+						sprintf( esc_html__( 'File uploads exceed the maximum number allowed (%s).', 'wpforms' ), '{fileLimit}' )
+					),
+					'file_extension'    => wpforms_setting( 'validation-fileextension', esc_html__( 'File type is not allowed.', 'wpforms' ) ),
+					'file_size'         => wpforms_setting( 'validation-filesize', esc_html__( 'File exceeds the max size allowed.', 'wpforms' ) ),
+					'post_max_size'     => sprintf(
+						/* translators: %s - max allowed file size by a server. */
+						esc_html__( 'File exceeds the upload limit allowed (%s).', 'wpforms' ),
+						size_format( wp_max_upload_size() )
+					),
+				],
+				'loading_message' => esc_html__( 'File upload is in progress. Please submit the form once uploading is completed.', 'wpforms' ),
+			]
+		);
 	}
 
 	/**
