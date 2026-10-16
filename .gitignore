@@ -6,6 +6,12 @@
 !/wordpress/wp-content/plugins/
 !/wordpress/wp-content/mu-plugins/
 
+# Plugins e temas sao runtime do servidor (reinstalaveis via WP.org).
+# Excecao: vverner (child theme proprio, historico) fica versionado.
+/wordpress/wp-content/plugins/*
+/wordpress/wp-content/themes/*
+!/wordpress/wp-content/themes/vverner/
+
 # Mídia e caches
 /wordpress/wp-content/uploads/
 /wordpress/wp-content/cache/
