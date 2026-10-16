@@ -170,6 +170,31 @@ remover o bloco `RioCargas LGPD` do `.htaccess` de `uploads/wpforms/`.
 Validado localmente: direto 403, assinado 200, adulterado 403, traversal 404,
 submit real com upload → entry + e-mail com link funcional.
 
+## Otimização de imagens — WebP com fallback (P1)
+
+Pacote `dist/riocargas-webp.zip` (~40 MB): 615 arquivos `.webp` gerados ao lado
+dos `.png`/`.jpg` originais em `wp-content/uploads/` (economia ~108 MB, q82) +
+`.htaccess` que serve a versão `.webp` só quando o navegador declara
+`Accept: image/webp` e o arquivo existe — originais intactos como fallback.
+
+**Deploy:** File Manager → `wp-content/uploads/` → upload do ZIP → **Extract**
+(cria os `.webp` ao lado dos originais e o `.htaccess`) → apagar o ZIP.
+
+**Validar:**
+
+```bash
+# sem Accept webp → PNG/JPG original:
+curl -s -o nul -w "%{size_download} %{content_type}" https://DOMINIO/wp-content/uploads/2022/06/Caminhao-RC.png
+# com Accept webp → ~103 KB image/webp:
+curl -s -o nul -H "Accept: image/webp,*/*" -w "%{size_download} %{content_type}" https://DOMINIO/wp-content/uploads/2022/06/Caminhao-RC.png
+```
+
+Cópia versionada da regra: `scripts/uploads-webp.htaccess`.
+
+**Rollback:** apagar o `.htaccess` de `wp-content/uploads/` (os `.webp` podem
+ficar — ficam inertes). Imagens novas enviadas depois não terão `.webp` até
+gerar novamente.
+
 ## Observações
 
 - `litespeed-cache` e `really-simple-ssl` devem **permanecer** em produção

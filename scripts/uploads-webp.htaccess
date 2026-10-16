@@ -1,0 +1,15 @@
+# Servir versao .webp quando o navegador aceita e o arquivo existe
+# Gerado para otimizacao P1 — originais .png/.jpg seguem como fallback
+<IfModule mod_rewrite.c>
+RewriteEngine On
+RewriteBase /wp-content/uploads/
+
+RewriteCond %{HTTP_ACCEPT} image/webp
+RewriteCond %{REQUEST_FILENAME} -f
+RewriteCond %{REQUEST_FILENAME}.webp -f
+RewriteRule ^(.+)\.(png|jpe?g)$ $1.$2.webp [NC,T=image/webp,L]
+</IfModule>
+
+<IfModule mod_headers.c>
+Header append Vary Accept
+</IfModule>
